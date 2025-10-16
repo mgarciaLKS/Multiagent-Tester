@@ -1,38 +1,24 @@
 """
-Multi-Agent Workflow System
-A supervisor-based multi-agent system for handling various types of queries
-
-Modular architecture with separate files for each component
+Multi-Agent System Package
+A modular multi-agent workflow system using LangGraph
 """
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
-# Import main workflow class
 from .workflow import MultiAgentWorkflow
-
-# Import all agents
+from .parallel_workflow import ParallelTestingWorkflow
 from .agents import (
-    BaseAgent,
     SupervisorAgent,
     FunctionalTesterAgent,
     UnitTesterAgent,
     IntegrationTesterAgent,
     ValidatorAgent,
 )
-
-# Import decision models
-from .models import (
-    SupervisorDecision,
-    ValidatorDecision,
-)
+from .models.decisions import SupervisorDecision, ValidatorDecision
 
 __version__ = "1.0.0"
 
 __all__ = [
     "MultiAgentWorkflow",
-    "BaseAgent",
+    "ParallelTestingWorkflow",
     "SupervisorAgent",
     "FunctionalTesterAgent",
     "UnitTesterAgent",

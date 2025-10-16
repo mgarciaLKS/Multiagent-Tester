@@ -1,21 +1,92 @@
 #!/usr/bin/env python3
+#!/usr/bin/env python3
 """
-Parallel Test Generation
-========================
+Parallel Test Generation Demo
+==============================
 
-This demonstrates a parallel approach to test generation where multiple
-agents work simultaneously on different aspects of the project.
+This demo shows how to run multiple testing agents in parallel
+to generate tests faster. Instead of running agents sequentially,
+we run Unit, Functional, and Integration testers simultaneously.
 
-Inspired by the parallel execution pattern, we:
-1. Analyze the project structure
-2. Run unit, integration, and functional test generation in parallel
-3. Collect and validate all results together
-
-This is more efficient than sequential processing.
+This approach:
+- Reduces total execution time
+- Generates tests for all aspects at once
+- Allows comparison of different testing approaches
+- More efficient use of API calls
 
 Usage:
     uv run python examples/parallel_test_generation.py
 """
+
+import os
+from pathlib import Path
+
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    # Load from project root
+    env_path = Path(__file__).parent.parent / ".env"
+    load_dotenv(env_path)
+except ImportError:
+    print("⚠️  python-dotenv not installed, assuming environment variables are set")
+
+from multiagent_system import ParallelTestingWorkflow
+
+
+def main():
+    """Run parallel test generation demo"""
+    
+    print("=" * 80)
+    print("🔀 PARALLEL TEST GENERATION DEMO")
+    print("=" * 80)
+    print()
+    print("This demo will run Unit, Functional, and Integration testers")
+    print("in parallel to generate tests faster!")
+    print()
+    print("Target: audio.py from whatsapp-mcp project")
+    print("=" * 80)
+    print()
+    
+    # Initialize parallel workflow
+    workflow = ParallelTestingWorkflow()
+    
+    # Test request
+    request = """
+    Generate comprehensive tests for audio.py in the WhatsApp MCP project.
+    
+    File: /home/mgarcia/Desktop/Otros/IA/CURSO UPV MCP/whatsapp-mcp/whatsapp-mcp-server/audio.py
+    
+    This file handles audio file conversion using ffmpeg.
+    
+    Please generate:
+    1. Unit tests for the convert_to_ogg function
+    2. Functional tests for complete audio processing workflows
+    3. Integration tests for ffmpeg subprocess interaction
+    
+    Save all tests to: /home/mgarcia/Desktop/Otros/IA/CURSO UPV MCP/whatsapp-mcp/whatsapp-mcp-server/tests/
+    
+    Use pytest, mock external dependencies, and test edge cases.
+    """
+    
+    # Run in parallel
+    results = workflow.run_parallel_sync(request)
+    
+    # Print formatted results
+    workflow.print_results(results)
+    
+    print()
+    print("✅ Parallel execution complete!")
+    print()
+    print("💡 Benefits of Parallel Execution:")
+    print("   - All 3 agent types run simultaneously")
+    print("   - Faster total execution time")
+    print("   - Multiple perspectives on testing")
+    print("   - Can compare and combine results")
+    print()
+
+
+if __name__ == "__main__":
+    main()
 
 import asyncio
 from pathlib import Path
