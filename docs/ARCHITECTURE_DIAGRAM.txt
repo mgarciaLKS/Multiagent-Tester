@@ -1,0 +1,171 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                    MULTI-AGENT WORKFLOW ARCHITECTURE                      ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          CLASS HIERARCHY                                 │
+└─────────────────────────────────────────────────────────────────────────┘
+
+                            ┌──────────────┐
+                            │  BaseAgent   │
+                            │  (Abstract)  │
+                            └──────┬───────┘
+                                   │
+                    ┌──────────────┼──────────────┐
+                    │              │              │
+         ┌──────────▼────┐  ┌──────▼──────┐  ┌───▼──────────┐
+         │ SupervisorAgent│  │EnhancerAgent│  │ResearcherAgent│
+         └────────────────┘  └─────────────┘  └──────────────┘
+                    │              │              │
+         ┌──────────┼──────────────┼──────────────┘
+         │          │              │
+    ┌────▼────┐  ┌──▼────────┐  ┌─▼──────────┐
+    │CoderAgent│  │GenericAgent│  │ValidatorAgent│
+    └─────────┘  └───────────┘  └────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         WORKFLOW EXECUTION FLOW                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+                              ┌────────────┐
+                              │   START    │
+                              └──────┬─────┘
+                                     │
+                              ┌──────▼──────────┐
+                              │  Supervisor     │
+                              │  Agent          │
+                              └──────┬──────────┘
+                                     │
+        ┌────────────────────────────┼────────────────────────────┐
+        │                            │                            │
+  ┌─────▼─────┐              ┌───────▼───────┐          ┌────────▼────────┐
+  │ Enhancer  │              │  Researcher   │          │     Coder       │
+  │  Agent    │              │    Agent      │          │     Agent       │
+  └─────┬─────┘              └───────┬───────┘          └────────┬────────┘
+        │                            │                            │
+        │ (loops back)               │                            │
+        └───────────┬────────────────┼────────────────────────────┘
+                    │                │                            │
+                    │         ┌──────▼──────┐                    │
+                    │         │   Generic   │                    │
+                    │         │    Agent    │                    │
+                    │         └──────┬──────┘                    │
+                    │                │                            │
+                    └────────────────┼────────────────────────────┘
+                                     │
+                              ┌──────▼──────────┐
+                              │   Validator     │
+                              │     Agent       │
+                              └──────┬──────────┘
+                                     │
+                    ┌────────────────┼────────────────┐
+                    │                                 │
+            ┌───────▼────────┐              ┌────────▼─────┐
+            │   Supervisor   │              │     END      │
+            │   (retry)      │              │  (finish)    │
+            └────────────────┘              └──────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    MULTI-AGENT WORKFLOW CLASS                            │
+└─────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────────────────────────────────────────┐
+    │         MultiAgentWorkflow                           │
+    ├──────────────────────────────────────────────────────┤
+    │  Properties:                                         │
+    │    - llm: ChatOpenAI                                 │
+    │    - supervisor: SupervisorAgent                     │
+    │    - enhancer: EnhancerAgent                         │
+    │    - researcher: ResearcherAgent                     │
+    │    - coder: CoderAgent                               │
+    │    - generic: GenericAgent                           │
+    │    - validator: ValidatorAgent                       │
+    │    - app: CompiledGraph                              │
+    ├──────────────────────────────────────────────────────┤
+    │  Methods:                                            │
+    │    + __init__(model_name)                            │
+    │    + _build_graph() → CompiledGraph                  │
+    │    + run(user_input, config) → Generator            │
+    │    + run_and_print(user_input, config) → None       │
+    │    + get_graph_image() → Image                       │
+    └──────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         AGENT RESPONSIBILITIES                           │
+└─────────────────────────────────────────────────────────────────────────┘
+
+╔════════════════════╦═══════════════════════════════════════════════════╗
+║ Agent              ║ Responsibility                                    ║
+╠════════════════════╬═══════════════════════════════════════════════════╣
+║ SupervisorAgent    ║ Route requests to appropriate specialist agents  ║
+║                    ║ Analyze task requirements and complexity         ║
+║                    ║ Coordinate workflow between agents               ║
+╠════════════════════╬═══════════════════════════════════════════════════╣
+║ EnhancerAgent      ║ Clarify ambiguous user queries                   ║
+║                    ║ Transform vague requests into precise tasks      ║
+║                    ║ Expand underspecified requirements               ║
+╠════════════════════╬═══════════════════════════════════════════════════╣
+║ ResearcherAgent    ║ Gather information from web sources              ║
+║                    ║ Cite and organize research findings              ║
+║                    ║ Provide factual, up-to-date information          ║
+╠════════════════════╬═══════════════════════════════════════════════════╣
+║ CoderAgent         ║ Execute Python code for calculations             ║
+║                    ║ Solve mathematical problems                      ║
+║                    ║ Perform data analysis and transformations        ║
+╠════════════════════╬═══════════════════════════════════════════════════╣
+║ GenericAgent       ║ Answer general knowledge questions               ║
+║                    ║ Handle simple queries without tools              ║
+║                    ║ Provide direct responses                         ║
+╠════════════════════╬═══════════════════════════════════════════════════╣
+║ ValidatorAgent     ║ Assess response quality and completeness         ║
+║                    ║ Decide whether to finish or continue workflow    ║
+║                    ║ Prevent infinite loops and ensure termination    ║
+╚════════════════════╩═══════════════════════════════════════════════════╝
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                            DATA FLOW                                     │
+└─────────────────────────────────────────────────────────────────────────┘
+
+User Input
+    │
+    ▼
+┌───────────────┐
+│ MessagesState │  ◄───┐
+└───────┬───────┘      │
+        │              │
+        ▼              │
+   [Agent.process()]   │
+        │              │
+        ▼              │
+  ┌─────────┐         │
+  │ Command │ ────────┘  (updates state, routes to next agent)
+  └─────────┘
+        │
+        ▼
+  [Next Agent]
+        │
+        ▼
+     (repeat)
+        │
+        ▼
+   Final Output
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          KEY FEATURES                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+
+✓ Object-Oriented Design      - Clean class hierarchy with inheritance
+✓ Single Responsibility        - Each agent has one clear purpose
+✓ Dependency Injection         - LLM injected into agents
+✓ Encapsulation               - Internal state hidden, clean interfaces
+✓ Polymorphism                - All agents implement BaseAgent.process()
+✓ Type Safety                 - Full type hints with Pydantic models
+✓ Testability                 - Easy to mock and unit test
+✓ Extensibility               - Add new agents by extending BaseAgent
+✓ Maintainability             - Clear structure, easy to modify
+✓ Reusability                 - Agents can be used independently
