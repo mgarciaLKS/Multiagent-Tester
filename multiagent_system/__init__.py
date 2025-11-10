@@ -1,10 +1,9 @@
 """
-Multi-Agent System Package
-A modular multi-agent workflow system using LangGraph
+Multi-Agent Testing System
+Parallel execution workflow for automated test generation
 """
 
-from .workflow import MultiAgentWorkflow
-from .parallel_workflow import ParallelTestingWorkflow
+from .parallel_workflow import ParallelTestingWorkflow as MultiAgentWorkflow
 from .agents import (
     SupervisorAgent,
     FunctionalTesterAgent,
@@ -14,11 +13,10 @@ from .agents import (
 )
 from .models.decisions import SupervisorDecision, ValidatorDecision
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 
 __all__ = [
     "MultiAgentWorkflow",
-    "ParallelTestingWorkflow",
     "SupervisorAgent",
     "FunctionalTesterAgent",
     "UnitTesterAgent",

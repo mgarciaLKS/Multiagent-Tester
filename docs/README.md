@@ -158,15 +158,15 @@ cp .env.example .env
 # Add your OPENAI_API_KEY
 
 # Run demo
-uv run python examples/quick_test.py
+uv run python examples/demo.py
 ```
 
 ### Generate Tests for Your Project
 
 ```python
-from multiagent_system import ParallelTestingWorkflow
+from multiagent_system import MultiAgentWorkflow
 
-workflow = ParallelTestingWorkflow()
+workflow = MultiAgentWorkflow()
 results = workflow.run_parallel_sync("""
     Generate comprehensive tests for /path/to/project
     
@@ -191,8 +191,8 @@ workflow.print_results(results)
 ### Beginner Path (30 minutes)
 1. Read this README
 2. Follow [QUICK_REFERENCE.md](QUICK_REFERENCE.md)
-3. Run `examples/quick_test.py`
-4. Generate tests for a small file
+3. Run `examples/demo.py`
+4. Generate tests for your own project
 
 ### Intermediate Path (2 hours)
 1. Study [MODULAR_STRUCTURE.md](MODULAR_STRUCTURE.md)
@@ -210,15 +210,9 @@ workflow.print_results(results)
 
 ## 🎯 Common Tasks
 
-### Generate Unit Tests Only
+### Generate Comprehensive Tests
 ```python
 workflow = MultiAgentWorkflow()
-workflow.run("Generate unit tests for mymodule.py with mocking")
-```
-
-### Generate All Test Types (Parallel)
-```python
-workflow = ParallelTestingWorkflow()
 workflow.run_parallel_sync("Generate comprehensive test suite")
 ```
 
