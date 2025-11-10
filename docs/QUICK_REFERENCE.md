@@ -26,7 +26,7 @@ workflow.run_and_print("Your question here")
 
 ### Different Model
 ```python
-workflow = MultiAgentWorkflow(model_name="gpt-4o-mini")
+workflow = MultiAgentWorkflow(model_name="gpt-5-mini")
 ```
 
 ### Stream Events
@@ -240,7 +240,7 @@ except ValueError as e:
 from multiagent_system.agents import ResearcherAgent
 from langchain_openai import ChatOpenAI
 
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatOpenAI(model="gpt-5")
 agent = ResearcherAgent(llm)
 result = agent.process(state)
 ```
@@ -249,7 +249,7 @@ result = agent.process(state)
 
 ## ⚡ Performance Tips
 
-1. Use `gpt-4o-mini` for faster responses
+1. Use `gpt-5-mini` for faster responses
 2. Set `recursion_limit` lower (e.g., 15)
 3. Enable LangSmith caching
 4. Use specific queries (avoid vague)
@@ -273,10 +273,10 @@ result = agent.process(state)
 
 ```python
 # Most capable (default)
-MultiAgentWorkflow(model_name="gpt-4o")
+MultiAgentWorkflow(model_name="gpt-5")
 
 # Fast & cheap
-MultiAgentWorkflow(model_name="gpt-4o-mini")
+MultiAgentWorkflow(model_name="gpt-5-mini")
 
 # High performance
 MultiAgentWorkflow(model_name="gpt-4-turbo")

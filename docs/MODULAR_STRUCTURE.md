@@ -230,7 +230,7 @@ workflow.run_and_print("Your query here")
 from multiagent_system.agents import SupervisorAgent, EnhancerAgent
 from langchain_openai import ChatOpenAI
 
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatOpenAI(model="gpt-5")
 supervisor = SupervisorAgent(llm)
 ```
 
@@ -320,7 +320,7 @@ from multiagent_system.agents import ResearcherAgent
 from langchain_openai import ChatOpenAI
 
 # Create and use a single agent
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatOpenAI(model="gpt-5")
 researcher = ResearcherAgent(llm)
 
 # Use in custom workflow
@@ -432,7 +432,7 @@ from multiagent_system.agents import SupervisorAgent
 from langchain_openai import ChatOpenAI
 
 def test_supervisor_routing():
-    llm = ChatOpenAI(model="gpt-4o")
+    llm = ChatOpenAI(model="gpt-5")
     supervisor = SupervisorAgent(llm)
     # Test logic
 ```

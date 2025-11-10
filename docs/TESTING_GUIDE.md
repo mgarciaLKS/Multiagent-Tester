@@ -181,7 +181,7 @@ from langchain_core.messages import HumanMessage
 
 def get_test_llm():
     """Get test LLM instance"""
-    return ChatOpenAI(model="gpt-4o", temperature=0)
+    return ChatOpenAI(model="gpt-5", temperature=0)
 
 def test_supervisor_initialization():
     """Test supervisor agent initializes correctly"""
@@ -287,8 +287,8 @@ def test_workflow_initialization():
 
 def test_workflow_different_model():
     """Test workflow with different model"""
-    workflow = MultiAgentWorkflow(model_name="gpt-4o-mini")
-    assert workflow.llm.model_name == "gpt-4o-mini"
+    workflow = MultiAgentWorkflow(model_name="gpt-5-mini")
+    assert workflow.llm.model_name == "gpt-5-mini"
 
 def test_graph_compilation():
     """Test graph compiles without errors"""
@@ -500,7 +500,7 @@ from langchain_core.messages import HumanMessage
 def test_your_agent():
     """Test your agent does what it should"""
     # Arrange
-    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    llm = ChatOpenAI(model="gpt-5", temperature=0)
     agent = YourAgent(llm)
     state = {'messages': [HumanMessage(content="Test message")]}
     
@@ -557,7 +557,7 @@ uv run python -c "import multiagent_system; print(multiagent_system.__version__)
 # Test LLM connection
 uv run python -c "
 from langchain_openai import ChatOpenAI
-llm = ChatOpenAI(model='gpt-4o')
+llm = ChatOpenAI(model='gpt-5')
 response = llm.invoke('Say hello')
 print(response.content)
 "

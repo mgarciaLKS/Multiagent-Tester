@@ -8,6 +8,7 @@ from .functionaltester_agent import FunctionalTesterAgent
 from .unittester_agent import UnitTesterAgent
 from .integrationtester_agent import IntegrationTesterAgent
 from .validator_agent import ValidatorAgent
+from .report_agent import ReportAgent
 
 __all__ = [
     "BaseAgent",
@@ -16,4 +17,5 @@ __all__ = [
     "UnitTesterAgent",
     "IntegrationTesterAgent",
     "ValidatorAgent",
+    "ReportAgent",
 ]

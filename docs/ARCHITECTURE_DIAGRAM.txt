@@ -1,5 +1,6 @@
 ╔═══════════════════════════════════════════════════════════════════════════╗
-║                    MULTI-AGENT WORKFLOW ARCHITECTURE                      ║
+║              PARALLEL TEST GENERATION WORKFLOW ARCHITECTURE               ║
+║                         (Multi-Agent System v2.0.0)                       ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -11,161 +12,324 @@
                             │  (Abstract)  │
                             └──────┬───────┘
                                    │
-                    ┌──────────────┼──────────────┐
-                    │              │              │
-         ┌──────────▼────┐  ┌──────▼──────┐  ┌───▼──────────┐
-         │ SupervisorAgent│  │EnhancerAgent│  │ResearcherAgent│
-         └────────────────┘  └─────────────┘  └──────────────┘
-                    │              │              │
-         ┌──────────┼──────────────┼──────────────┘
-         │          │              │
-    ┌────▼────┐  ┌──▼────────┐  ┌─▼──────────┐
-    │CoderAgent│  │GenericAgent│  │ValidatorAgent│
-    └─────────┘  └───────────┘  └────────────┘
+        ┌──────────────────────────┼───────────────────────────────────┐
+        │                          │                                   │
+  ┌─────▼────────┐      ┌──────────▼──────────┐               ┌────────▼────────┐
+  │Supervisor    │      │  Testing Agents     │               │   Support       │
+  │Agent         │      │  (with ReACT)       │               │   Agents        │
+  └──────────────┘      └──────────┬──────────┘               └────────┬────────┘
+                                   │                                   │
+              ┌────────────────────┼────────────┐                      │
+              │                    │            │                      │
+      ┌───────▼──────┐   ┌─────────▼─────┐   ┌─▼────────────┐   ┌──────▼──────┐
+      │UnitTester    │   │FunctionalTester│  │Integration   │   │Validator    │
+      │Agent         │   │Agent           │  │TesterAgent   │   │Agent        │
+      └──────────────┘   └────────────────┘  └──────────────┘   └──────┬──────┘
+                                                                       │
+                                                                ┌──────▼──────┐
+                                                                │Report       │
+                                                                │Agent        │
+                                                                └─────────────┘
 
 
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         WORKFLOW EXECUTION FLOW                          │
+│                  PARALLEL TEST GENERATION WORKFLOW                       │
+│                         (5 Phases Execution)                             │
 └─────────────────────────────────────────────────────────────────────────┘
 
                               ┌────────────┐
                               │   START    │
+                              │ User Input │
                               └──────┬─────┘
                                      │
-                              ┌──────▼──────────┐
-                              │  Supervisor     │
-                              │  Agent          │
-                              └──────┬──────────┘
+                     ════════════════▼════════════════
+                     ║   PHASE 1: Supervisor         ║
+                     ║   Analyzes request & routes   ║
+                     ════════════════┬════════════════
+                                     │
+                     ════════════════▼════════════════
+                     ║   PHASE 2: Parallel Testing   ║
+                     ║   (3 agents run concurrently) ║
+                     ════════════════┬════════════════
                                      │
         ┌────────────────────────────┼────────────────────────────┐
         │                            │                            │
-  ┌─────▼─────┐              ┌───────▼───────┐          ┌────────▼────────┐
-  │ Enhancer  │              │  Researcher   │          │     Coder       │
-  │  Agent    │              │    Agent      │          │     Agent       │
-  └─────┬─────┘              └───────┬───────┘          └────────┬────────┘
-        │                            │                            │
-        │ (loops back)               │                            │
-        └───────────┬────────────────┼────────────────────────────┘
-                    │                │                            │
-                    │         ┌──────▼──────┐                    │
-                    │         │   Generic   │                    │
-                    │         │    Agent    │                    │
-                    │         └──────┬──────┘                    │
-                    │                │                            │
-                    └────────────────┼────────────────────────────┘
-                                     │
-                              ┌──────▼──────────┐
-                              │   Validator     │
-                              │     Agent       │
-                              └──────┬──────────┘
-                                     │
-                    ┌────────────────┼────────────────┐
-                    │                                 │
-            ┌───────▼────────┐              ┌────────▼─────┐
-            │   Supervisor   │              │     END      │
-            │   (retry)      │              │  (finish)    │
-            └────────────────┘              └──────────────┘
+  ┌─────▼─────────┐          ┌───────▼────────┐          ┌───────▼────────┐
+  │  UnitTester   │          │  Functional    │          │  Integration   │
+  │   Agent       │          │  TesterAgent   │          │  TesterAgent   │
+  │ (ReACT+REPL)  │          │ (ReACT+REPL)   │          │ (ReACT+REPL)   │
+  └───────┬───────┘          └────────┬───────┘          └────────┬───────┘
+          │                           │                            │
+          │  Writes:                  │  Writes:                   │  Writes:
+          │  test_*.py                │  test_workflows.py         │  test_integration.py
+          │  (unit tests)             │  (functional tests)        │  (integration tests)
+          │                           │                            │
+          └───────────────────────────┼────────────────────────────┘
+                                      │
+                      ════════════════▼════════════════
+                      ║   PHASE 3: Results Summary   ║
+                      ║   Collect all agent outputs  ║
+                      ════════════════┬════════════════
+                                      │
+                      ════════════════▼════════════════
+                      ║   PHASE 4: Validation        ║
+                      ║   Real pytest execution      ║
+                      ════════════════┬════════════════
+                                      │
+                              ┌───────▼────────┐
+                              │  Validator     │
+                              │  Agent         │
+                              │  • Finds files │
+                              │  • Runs pytest │
+                              │  • Checks pass │
+                              └───────┬────────┘
+                                      │
+                      ════════════════▼════════════════
+                      ║   PHASE 5: Report            ║
+                      ║   Generate comprehensive     ║
+                      ║   markdown report            ║
+                      ════════════════┬════════════════
+                                      │
+                              ┌───────▼────────┐
+                              │  Report Agent  │
+                              │  • Coverage    │
+                              │  • Validation  │
+                              │  • Metrics     │
+                              └───────┬────────┘
+                                      │
+                    ┌─────────────────┼─────────────────┐
+                    │                 │                 │
+            ┌───────▼────────┐  ┌─────▼──────┐  ┌─────▼──────┐
+            │   Supervisor   │  │   FINISH   │  │   Report   │
+            │   (needs work) │  │  (success) │  │  Generated │
+            └────────────────┘  └────────────┘  └────────────┘
 
 
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                    MULTI-AGENT WORKFLOW CLASS                            │
+│                  PARALLEL TESTING WORKFLOW CLASS                         │
 └─────────────────────────────────────────────────────────────────────────┘
 
-    ┌──────────────────────────────────────────────────────┐
-    │         MultiAgentWorkflow                           │
-    ├──────────────────────────────────────────────────────┤
-    │  Properties:                                         │
-    │    - llm: ChatOpenAI                                 │
-    │    - supervisor: SupervisorAgent                     │
-    │    - enhancer: EnhancerAgent                         │
-    │    - researcher: ResearcherAgent                     │
-    │    - coder: CoderAgent                               │
-    │    - generic: GenericAgent                           │
-    │    - validator: ValidatorAgent                       │
-    │    - app: CompiledGraph                              │
-    ├──────────────────────────────────────────────────────┤
-    │  Methods:                                            │
-    │    + __init__(model_name)                            │
-    │    + _build_graph() → CompiledGraph                  │
-    │    + run(user_input, config) → Generator            │
-    │    + run_and_print(user_input, config) → None       │
-    │    + get_graph_image() → Image                       │
-    └──────────────────────────────────────────────────────┘
+    ┌────────────────────────────────────────────────────────┐
+    │         ParallelTestingWorkflow                        │
+    ├────────────────────────────────────────────────────────┤
+    │  Properties:                                           │
+    │    - llm: ChatOpenAI (gpt-5)                          │
+    │    - output_dir: Path (where tests are generated)      │
+    │    - supervisor: SupervisorAgent                       │
+    │    - unit_tester: UnitTesterAgent (ReACT+REPL)         │
+    │    - functional_tester: FunctionalTesterAgent (ReACT)  │
+    │    - integration_tester: IntegrationTesterAgent (ReACT)│
+    │    - validator: ValidatorAgent (pytest executor)       │
+    │    - report_agent: ReportAgent (coverage analyzer)     │
+    ├────────────────────────────────────────────────────────┤
+    │  Methods:                                              │
+    │    + __init__(model_name, output_dir)                  │
+    │    + run_parallel(user_input) → Dict[str, Any]         │
+    │    + run_parallel_sync(user_input) → Dict[str, Any]    │
+    │    + print_results(results) → None                     │
+    │    + _run_agent_async(agent, state, name) → Dict       │
+    └────────────────────────────────────────────────────────┘
+
+    ┌────────────────────────────────────────────────────────┐
+    │         MultiAgentWorkflow (Wrapper)                   │
+    ├────────────────────────────────────────────────────────┤
+    │  Provides backward compatibility and convenience       │
+    ├────────────────────────────────────────────────────────┤
+    │  Methods:                                              │
+    │    + __init__(output_dir)                              │
+    │    + run_parallel_sync(user_input) → Dict              │
+    │    + print_results(results) → None                     │
+    └────────────────────────────────────────────────────────┘
 
 
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                         AGENT RESPONSIBILITIES                           │
 └─────────────────────────────────────────────────────────────────────────┘
 
-╔════════════════════╦═══════════════════════════════════════════════════╗
-║ Agent              ║ Responsibility                                    ║
-╠════════════════════╬═══════════════════════════════════════════════════╣
-║ SupervisorAgent    ║ Route requests to appropriate specialist agents  ║
-║                    ║ Analyze task requirements and complexity         ║
-║                    ║ Coordinate workflow between agents               ║
-╠════════════════════╬═══════════════════════════════════════════════════╣
-║ EnhancerAgent      ║ Clarify ambiguous user queries                   ║
-║                    ║ Transform vague requests into precise tasks      ║
-║                    ║ Expand underspecified requirements               ║
-╠════════════════════╬═══════════════════════════════════════════════════╣
-║ ResearcherAgent    ║ Gather information from web sources              ║
-║                    ║ Cite and organize research findings              ║
-║                    ║ Provide factual, up-to-date information          ║
-╠════════════════════╬═══════════════════════════════════════════════════╣
-║ CoderAgent         ║ Execute Python code for calculations             ║
-║                    ║ Solve mathematical problems                      ║
-║                    ║ Perform data analysis and transformations        ║
-╠════════════════════╬═══════════════════════════════════════════════════╣
-║ GenericAgent       ║ Answer general knowledge questions               ║
-║                    ║ Handle simple queries without tools              ║
-║                    ║ Provide direct responses                         ║
-╠════════════════════╬═══════════════════════════════════════════════════╣
-║ ValidatorAgent     ║ Assess response quality and completeness         ║
-║                    ║ Decide whether to finish or continue workflow    ║
-║                    ║ Prevent infinite loops and ensure termination    ║
-╚════════════════════╩═══════════════════════════════════════════════════╝
+╔══════════════════════╦═════════════════════════════════════════════════╗
+║ Agent                ║ Responsibility                                  ║
+╠══════════════════════╬═════════════════════════════════════════════════╣
+║ SupervisorAgent      ║ Analyze test generation requests               ║
+║                      ║ Route to appropriate test generation agents    ║
+║                      ║ Coordinate parallel execution workflow         ║
+║                      ║ Handle retry logic when tests need fixes       ║
+╠══════════════════════╬═════════════════════════════════════════════════╣
+║ UnitTesterAgent      ║ Generate comprehensive unit tests              ║
+║ (ReACT + REPL)       ║ Test individual functions/methods              ║
+║                      ║ Use PythonREPLTool to read files & write tests ║
+║                      ║ Mock external dependencies                     ║
+║                      ║ Create test_*.py files in unit_tests/         ║
+╠══════════════════════╬═════════════════════════════════════════════════╣
+║ FunctionalTester     ║ Generate end-to-end functional tests           ║
+║ Agent                ║ Test complete user workflows                   ║
+║ (ReACT + REPL)       ║ Use PythonREPLTool to read & write files       ║
+║                      ║ Validate business logic and requirements       ║
+║                      ║ Create test files in functional_tests/         ║
+╠══════════════════════╬═════════════════════════════════════════════════╣
+║ IntegrationTester    ║ Generate integration tests                     ║
+║ Agent                ║ Test component interactions                    ║
+║ (ReACT + REPL)       ║ Use PythonREPLTool to read & write files       ║
+║                      ║ Verify data flow between components            ║
+║                      ║ Create test files in integration_tests/        ║
+╠══════════════════════╬═════════════════════════════════════════════════╣
+║ ValidatorAgent       ║ ACTUALLY RUN generated tests with pytest       ║
+║ (Real Executor)      ║ Check filesystem for test files                ║
+║                      ║ Execute subprocess: pytest --cov               ║
+║                      ║ Parse test results (pass/fail counts)          ║
+║                      ║ Detect import errors, syntax errors            ║
+║                      ║ Route to supervisor if fixes needed            ║
+║                      ║ Route to FINISH if tests pass                  ║
+╠══════════════════════╬═════════════════════════════════════════════════╣
+║ ReportAgent          ║ Generate comprehensive markdown reports        ║
+║ (Coverage Analyzer)  ║ Run pytest-cov for coverage analysis           ║
+║                      ║ Gather test file information                   ║
+║                      ║ Capture validator decisions & reasoning        ║
+║                      ║ Create executive summary with metrics          ║
+║                      ║ Provide actionable recommendations             ║
+║                      ║ Save TEST_REPORT.md with all findings          ║
+╚══════════════════════╩═════════════════════════════════════════════════╝
 
 
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                            DATA FLOW                                     │
+│                         DATA FLOW & EXECUTION                            │
 └─────────────────────────────────────────────────────────────────────────┘
 
-User Input
+User Input (Test Generation Request)
     │
     ▼
-┌───────────────┐
-│ MessagesState │  ◄───┐
-└───────┬───────┘      │
-        │              │
-        ▼              │
-   [Agent.process()]   │
-        │              │
-        ▼              │
-  ┌─────────┐         │
-  │ Command │ ────────┘  (updates state, routes to next agent)
-  └─────────┘
-        │
-        ▼
-  [Next Agent]
-        │
-        ▼
-     (repeat)
-        │
-        ▼
-   Final Output
+┌───────────────────────────────────────────────────────────────┐
+│ Phase 1: Supervisor Analysis                                  │
+│ MessagesState: [HumanMessage(content=request, name="user")]   │
+└───────────────────────────┬───────────────────────────────────┘
+                            │
+                            ▼
+┌───────────────────────────────────────────────────────────────┐
+│ Phase 2: Parallel Execution (asyncio.gather)                  │
+│                                                                │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐        │
+│  │UnitTester   │  │Functional    │  │Integration   │        │
+│  │  (async)    │  │Tester (async)│  │Tester (async)│        │
+│  └──────┬──────┘  └──────┬───────┘  └──────┬───────┘        │
+│         │                │                  │                 │
+│         ▼                ▼                  ▼                 │
+│  Writes files     Writes files       Writes files            │
+│  (test_*.py)      (test_*.py)        (test_*.py)             │
+└───────────────────────────┬───────────────────────────────────┘
+                            │
+                            ▼
+┌───────────────────────────────────────────────────────────────┐
+│ Phase 3: Collect Results                                      │
+│ Combine all messages from successful agents                   │
+└───────────────────────────┬───────────────────────────────────┘
+                            │
+                            ▼
+┌───────────────────────────────────────────────────────────────┐
+│ Phase 4: Validation                                           │
+│ ValidatorAgent.verify_tests():                                │
+│   • glob('test_*.py') - find files                            │
+│   • subprocess.run(['pytest', '--cov']) - execute             │
+│   • Parse output - count pass/fail                            │
+│   • Return verification dict                                  │
+│                                                                │
+│ Command(goto="supervisor" or goto="__end__")                  │
+└───────────────────────────┬───────────────────────────────────┘
+                            │
+                            ▼
+┌───────────────────────────────────────────────────────────────┐
+│ Phase 5: Report Generation                                    │
+│ ReportAgent:                                                  │
+│   • gather_coverage_data() - run pytest-cov                   │
+│   • gather_test_files_info() - scan directories              │
+│   • Generate markdown report with LLM                         │
+│   • Save TEST_REPORT.md                                       │
+│                                                                │
+│ Command(goto="__end__")                                       │
+└───────────────────────────┬───────────────────────────────────┘
+                            │
+                            ▼
+                    Final Output:
+                    • Test files in output/
+                    • TEST_REPORT.md
+                    • Coverage metrics
 
 
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                          KEY FEATURES                                    │
 └─────────────────────────────────────────────────────────────────────────┘
 
+✓ Parallel Execution          - 3 test agents run simultaneously
+✓ Real Test Verification      - Validator executes pytest, not text analysis
+✓ Code Coverage Analysis      - pytest-cov integration for metrics
+✓ Comprehensive Reporting     - Professional markdown reports with coverage
+✓ ReACT Pattern               - Agents can reason, act, and observe
+✓ PythonREPLTool             - Agents write files and execute code
 ✓ Object-Oriented Design      - Clean class hierarchy with inheritance
-✓ Single Responsibility        - Each agent has one clear purpose
-✓ Dependency Injection         - LLM injected into agents
-✓ Encapsulation               - Internal state hidden, clean interfaces
-✓ Polymorphism                - All agents implement BaseAgent.process()
-✓ Type Safety                 - Full type hints with Pydantic models
-✓ Testability                 - Easy to mock and unit test
-✓ Extensibility               - Add new agents by extending BaseAgent
-✓ Maintainability             - Clear structure, easy to modify
-✓ Reusability                 - Agents can be used independently
+✓ Single Responsibility       - Each agent has one clear purpose
+✓ Dependency Injection        - LLM and output_dir injected
+✓ Encapsulation              - Internal state hidden, clean interfaces
+✓ Polymorphism               - All agents implement BaseAgent.process()
+✓ Type Safety                - Full type hints with Pydantic models
+✓ Async/Await Support        - asyncio for parallel agent execution
+✓ Subprocess Integration     - Real pytest execution and verification
+✓ File System Operations     - Agents create directories and write files
+✓ Error Detection            - Catches import errors, syntax errors
+✓ Testability                - Easy to mock and unit test
+✓ Extensibility              - Add new agents by extending BaseAgent
+✓ Maintainability            - Clear structure, easy to modify
+✓ Reusability                - Agents can be used independently
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     TECHNOLOGY STACK                                     │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────┬──────────────────────────────────────────────┐
+│ Component            │ Technology                                   │
+├──────────────────────┼──────────────────────────────────────────────┤
+│ LLM                  │ OpenAI gpt-5                                │
+│ Framework            │ LangGraph 0.6.10                             │
+│ Agent Pattern        │ ReACT (Reason + Act + Observe)               │
+│ Code Execution       │ PythonREPLTool (langchain_experimental)      │
+│ Test Framework       │ pytest                                       │
+│ Coverage Tool        │ pytest-cov                                   │
+│ Async Runtime        │ asyncio (Python standard library)            │
+│ Type Checking        │ Pydantic models, Python type hints           │
+│ Subprocess           │ subprocess.run (for pytest execution)        │
+│ File Operations      │ pathlib.Path                                 │
+│ Report Format        │ Markdown                                     │
+└──────────────────────┴──────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     OUTPUT STRUCTURE                                     │
+└─────────────────────────────────────────────────────────────────────────┘
+
+output/
+├── unit_tests/
+│   ├── test_audio.py           (Unit tests - ~30 lines)
+│   ├── test_whatsapp.py        (Unit tests - ~30 lines)
+│   └── __pycache__/            (pytest cache)
+├── functional_tests/
+│   ├── test_workflows.py       (Functional tests - ~34 lines)
+│   └── __pycache__/
+├── integration_tests/
+│   ├── test_integration.py     (Integration tests - ~47 lines)
+│   └── __pycache__/
+└── TEST_REPORT.md              (Comprehensive report - ~2.9KB)
+    ├── 1. Executive Summary
+    ├── 2. Test Generation Details
+    ├── 3. Validation Results      (Real pytest execution)
+    ├── 4. Quality Assessment      (Coverage percentage)
+    └── 5. Recommendations
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                  VERSION HISTORY                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+
+v1.0.0 - Sequential workflow with enhancer, researcher, coder agents
+v2.0.0 - Parallel test generation workflow (current)
+         • 3 test generation agents (Unit, Functional, Integration)
+         • Real validator with pytest execution
+         • Report agent with coverage analysis
+         • PythonREPLTool integration for file operations

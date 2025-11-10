@@ -6,7 +6,7 @@
 
 
 
-[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)> A modular multi-agent system built with LangGraph, LangChain, and OpenAI GPT-4oA LangGraph-based multi-agent system with a supervisor pattern for handling various types of queries through specialized agents.
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)> A modular multi-agent system built with LangGraph, LangChain, and OpenAI gpt-5A LangGraph-based multi-agent system with a supervisor pattern for handling various types of queries through specialized agents.
 
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.6.10-green.svg)](https://github.com/langchain-ai/langgraph)
 
@@ -454,7 +454,7 @@ uv run python -c "from multiagent_system import *; print('✅ OK')"```
 
 ```python
 
-workflow = MultiAgentWorkflow(model_name="gpt-4o-mini")
+workflow = MultiAgentWorkflow(model_name="gpt-5-mini")
 
 ```
 
@@ -560,7 +560,7 @@ from multiagent_system import MultiAgentWorkflow### Basic Usage (Code)
 
 - [LangChain](https://github.com/langchain-ai/langchain) - LLM frameworkMultiAgentWorkflow().run_and_print('What is the capital of France?')```python
 
-- [OpenAI](https://openai.com/) - GPT-4o model
+- [OpenAI](https://openai.com/) - gpt-5 model
 
 - [UV](https://github.com/astral-sh/uv) - Fast Python package manager"from workflow import MultiAgentWorkflow
 

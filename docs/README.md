@@ -248,7 +248,7 @@ LANGSMITH_API_KEY=your_key_here       # Optional: tracing
 
 ```python
 # Use different OpenAI model
-workflow = MultiAgentWorkflow(model_name="gpt-4o-mini")
+workflow = MultiAgentWorkflow(model_name="gpt-5-mini")
 ```
 
 ---

@@ -64,12 +64,34 @@ class UnitTesterAgent(BaseAgent):
                 "    assert result == expected_value\n"
                 "```\n\n"
                 
+                "**CRITICAL - Handling Import Issues**:\n"
+                "If the supervisor tells you to fix import errors in existing tests:\n"
+                "1. Read the test file that has import issues\n"
+                "2. Check what modules it's trying to import\n"
+                "3. Add sys.path configuration at the TOP of the test file:\n"
+                "   ```python\n"
+                "   import sys\n"
+                "   from pathlib import Path\n"
+                "   sys.path.insert(0, str(Path('/path/to/source/code')))\n"
+                "   ```\n"
+                "4. Use the EXACT path provided by supervisor\n"
+                "5. Ensure all required imports are present (subprocess, requests, etc.)\n"
+                "6. Fix any wrong module names if they don't match actual source files\n\n"
+                
+                "**When Fixing Existing Tests**:\n"
+                "- Read the existing test file first\n"
+                "- Identify the specific issue (imports, assertions, mocking)\n"
+                "- Make MINIMAL changes - only fix what's broken\n"
+                "- Preserve existing test logic unless it's fundamentally wrong\n"
+                "- Test your changes would work with the actual source code\n\n"
+                
                 "**Important**:\n"
                 "- Never ask questions - read files yourself using Python\n"
                 "- Always write complete, runnable test files\n"
                 "- Create tests/ directory if it doesn't exist\n"
                 "- Follow pytest conventions and best practices\n"
-                "- Provide clear summary of what you tested and coverage achieved"
+                "- Provide clear summary of what you tested and coverage achieved\n"
+                "- If fixing imports, report EXACTLY what you changed"
             )
         )
     
@@ -83,7 +105,19 @@ class UnitTesterAgent(BaseAgent):
         Returns:
             Command with test results and routing to validator
         """
-        result = self.code_agent.invoke(state)
+        try:
+            result = self.code_agent.invoke(state, config={"recursion_limit": 25})
+        except Exception as e:
+            print(f"⚠️ UnitTester error: {str(e)[:100]}")
+            # Return partial result even on error
+            return Command(
+                update={
+                    "messages": [
+                        HumanMessage(content=f"Unit test generation encountered an issue: {str(e)[:200]}", name="unit_tester")
+                    ]
+                },
+                goto="validator",
+            )
 
         print(f"--- Workflow Transition: UnitTester → Validator ---")
 
